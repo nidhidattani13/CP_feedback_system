@@ -7,13 +7,13 @@ if (isset($_SESSION['user_id'])) {
     $role = $_SESSION['role'];
     switch ($role) {
         case 'student':
-            header('Location: student/dashboard.php');
+            header('Location: ' . APP_BASE . '/frontend/student/dashboard.php');
             break;
         case 'faculty':
-            header('Location: faculty/dashboard.php');
+            header('Location: ' . APP_BASE . '/frontend/faculty/dashboard.php');
             break;
         case 'hod':
-            header('Location: hod/dashboard.php');
+            header('Location: ' . APP_BASE . '/frontend/hod/dashboard.php');
             break;
     }
     exit();
@@ -41,13 +41,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // Redirect based on role
             switch ($user['role']) {
                 case 'student':
-                    header('Location: student/dashboard.php');
+                    header('Location: ' . APP_BASE . '/frontend/student/dashboard.php');
                     break;
                 case 'faculty':
-                    header('Location: faculty/dashboard.php');
+                    header('Location: ' . APP_BASE . '/frontend/faculty/dashboard.php');
                     break;
                 case 'hod':
-                    header('Location: hod/dashboard.php');
+                    header('Location: ' . APP_BASE . '/frontend/hod/dashboard.php');
                     break;
             }
             exit();
