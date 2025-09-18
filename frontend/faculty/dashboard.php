@@ -14,6 +14,7 @@ include("../includes/header.php");
         <a class="list-group-item" href="add_assessment.php">Add Assessment Plan</a>
         <a class="list-group-item" href="view_feedback.php">View Feedback</a>
         <a class="list-group-item" href="events.php">Publish Events</a>
+        <a class="list-group-item" href="subjects.php">Manage Subjects</a>
       </div>
     </div>
   </div>

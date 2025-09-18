@@ -1,6 +1,7 @@
 <?php
 session_start();
 include("../../config.php");
+// Only faculty can add assessments
 if(empty($_SESSION['user_id']) || $_SESSION['role'] !== 'faculty') die("Access denied");
 
 $faculty_id = $_SESSION['user_id'];

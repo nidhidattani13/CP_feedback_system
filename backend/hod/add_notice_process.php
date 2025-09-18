@@ -1,11 +1,7 @@
 <?php
 session_start();
-require_once __DIR__ . '/../../config.php';
-
-if (empty($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'hod') {
-    header('Location: ' . APP_BASE . '/frontend/auth/login.php');
-    exit;
-}
+include("../../config.php");
+if(empty($_SESSION['user_id']) || $_SESSION['role'] !== 'hod') die("Access denied");
 
 $title = trim($_POST['title'] ?? '');
 $body = trim($_POST['body'] ?? '');

@@ -6,7 +6,7 @@ $email = trim($_POST['email'] ?? '');
 $password = $_POST['password'] ?? '';
 if (!$email || !$password) die("Missing fields.");
 
-$stmt = $conn->prepare("SELECT id, password, role, name FROM users WHERE email=? LIMIT 1");
+$stmt = $conn->prepare("SELECT id, password, role, name, enrollment_no, cgpa, category FROM users WHERE email=? LIMIT 1");
 $stmt->bind_param("s",$email);
 $stmt->execute();
 $res = $stmt->get_result();
@@ -20,6 +20,11 @@ if (!password_verify($password, $user['password'])) {
 $_SESSION['user_id'] = $user['id'];
 $_SESSION['role'] = $user['role'];
 $_SESSION['name'] = $user['name'];
+$_SESSION['enrollment_no'] = $user['enrollment_no'];
+if ($user['role'] === 'student') {
+    $_SESSION['cgpa'] = $user['cgpa'];
+    $_SESSION['category'] = $user['category'];
+}
 
 switch($user['role']) {
     case 'student': header("Location: ".APP_BASE."/frontend/student/dashboard.php"); break;
