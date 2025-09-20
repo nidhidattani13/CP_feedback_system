@@ -13,6 +13,8 @@ for ($i=1; $i<=8; $i++) {
     $sgpas[$i] = isset($_POST['sgpa'.$i]) ? floatval($_POST['sgpa'.$i]) : null;
 }
 
+$semester = ($role === 'student') ? ($_POST['semester'] ?? '') : null;
+
 // Role-based validation
 if (!valid_enrollment($enrollment_no, $role)) {
     die('Invalid enrollment number for role.');
@@ -31,14 +33,28 @@ if (!$name || !$email || !$password) {
     die("Missing fields.");
 }
 
+    if ($role === 'student' && (!$semester || !in_array($semester, ['1','2','3','4','5','6','7','8']))) {
+        die('Semester is required and must be between 1 and 8.');
+    }
+
 $hashed = password_hash($password, PASSWORD_DEFAULT);
 
 $stmt = $conn->prepare("INSERT INTO users (name,email,password,role,enrollment_no,sgpa1,sgpa2,sgpa3,sgpa4,sgpa5,sgpa6,sgpa7,sgpa8) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)");
-$stmt->bind_param(
-    "sssssdddddddd",
-    $name, $email, $hashed, $role, $enrollment_no,
-    $sgpas[1], $sgpas[2], $sgpas[3], $sgpas[4], $sgpas[5], $sgpas[6], $sgpas[7], $sgpas[8]
-);
+if ($role === 'student') {
+    $stmt = $conn->prepare("INSERT INTO users (name,email,password,role,enrollment_no,semester,sgpa1,sgpa2,sgpa3,sgpa4,sgpa5,sgpa6,sgpa7,sgpa8) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+    $stmt->bind_param(
+        "ssssssssdddddd",
+        $name, $email, $hashed, $role, $enrollment_no, $semester,
+        $sgpas[1], $sgpas[2], $sgpas[3], $sgpas[4], $sgpas[5], $sgpas[6], $sgpas[7], $sgpas[8]
+    );
+} else {
+    $stmt = $conn->prepare("INSERT INTO users (name,email,password,role,enrollment_no,sgpa1,sgpa2,sgpa3,sgpa4,sgpa5,sgpa6,sgpa7,sgpa8) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)");
+    $stmt->bind_param(
+        "sssssdddddddd",
+        $name, $email, $hashed, $role, $enrollment_no,
+        $sgpas[1], $sgpas[2], $sgpas[3], $sgpas[4], $sgpas[5], $sgpas[6], $sgpas[7], $sgpas[8]
+    );
+}
 if ($stmt->execute()) {
     $_SESSION['user_id'] = $stmt->insert_id;
     $_SESSION['role'] = $role;

@@ -32,6 +32,20 @@ include("../includes/header.php");
           <input name="enrollment_no" id="enrollment_no" class="form-control" required maxlength="16">
           <div class="invalid-feedback" id="enrollHelp"></div>
         </div>
+          <div class="mb-3" id="semesterField" style="display:none;">
+            <label class="form-label">Semester</label>
+            <select name="semester" class="form-select">
+              <option value="">Select Semester</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+            </select>
+          </div>
         <div id="sgpaFields" style="display:none;">
           <label class="form-label">SGPA (Sem 1-8)</label>
           <div class="row">
@@ -58,6 +72,8 @@ const enrollInput = document.getElementById('enrollment_no');
 const enrollHelp = document.getElementById('enrollHelp');
 const sgpaFields = document.getElementById('sgpaFields');
 const sgpaInputs = document.querySelectorAll('.sgpa-input');
+const semesterField = document.getElementById('semesterField');
+const semesterSelect = semesterField.querySelector('select');
 const sgpaHelp = document.getElementById('sgpaHelp');
 
 function updateFields() {
@@ -67,6 +83,9 @@ function updateFields() {
   enrollInput.placeholder = role === 'student' ? '11-digit' : (role === 'faculty' ? '6-digit' : '4-digit');
   sgpaFields.style.display = (role === 'student') ? '' : 'none';
   sgpaInputs.forEach(inp => { inp.required = false; inp.value = ''; });
+    semesterField.style.display = (role === 'student') ? '' : 'none';
+    semesterSelect.required = (role === 'student');
+    if (role !== 'student') semesterSelect.value = '';
 }
 roleSelect.addEventListener('change', updateFields);
 document.addEventListener('DOMContentLoaded', updateFields);
@@ -77,6 +96,14 @@ document.querySelector('form').addEventListener('submit', function(e) {
   sgpaHelp.textContent = '';
   const role = roleSelect.value;
   const enrollVal = enrollInput.value.trim();
+    if (role === 'student') {
+      if (!semesterSelect.value) {
+        semesterSelect.classList.add('is-invalid');
+        valid = false;
+      } else {
+        semesterSelect.classList.remove('is-invalid');
+      }
+    }
   if (role === 'student' && enrollVal.length !== 11) {
     enrollHelp.textContent = 'Enrollment number must be 11 digits for students.';
     enrollInput.classList.add('is-invalid');

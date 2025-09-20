@@ -11,8 +11,11 @@ $semester_applicability = intval($_POST['semester_applicability'] ?? 0);
 if(!$title || !$date) die("Missing fields.");
 
 $stmt = $conn->prepare("INSERT INTO events (title, description, date, semester_applicability) VALUES (?,?,?,?)");
+if(!$stmt){
+    die("Prepare failed: " . $conn->error);
+}
 $stmt->bind_param("sssi", $title, $description, $date, $semester_applicability);
 if($stmt->execute()){
     header("Location: " . APP_BASE . "/frontend/faculty/dashboard.php");
     exit;
-}else die("Insert failed.");
+}else die("Insert failed: " . $stmt->error);

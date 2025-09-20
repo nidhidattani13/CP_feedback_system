@@ -5,6 +5,14 @@ if(empty($_SESSION['user_id']) || $_SESSION['role'] !== 'faculty') {
   header("Location: " . APP_BASE . "/frontend/auth/login.php"); exit;
 }
 include("../includes/header.php");
+include("../../config.php");
+
+$event_filter_sem = isset($_GET['event_filter_sem']) ? intval($_GET['event_filter_sem']) : '';
+if ($event_filter_sem && $event_filter_sem > 0) {
+  $events = $conn->query("SELECT * FROM events WHERE semester_applicability=$event_filter_sem ORDER BY date DESC");
+} else {
+  $events = $conn->query("SELECT * FROM events ORDER BY date DESC");
+}
 ?>
 <div class="card card-lean p-3 mt-4">
   <h5>Publish Event</h5>

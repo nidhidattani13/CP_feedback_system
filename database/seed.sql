@@ -1,3 +1,24 @@
+-- Fixed feedback questions
+INSERT INTO questions (question_text, question_type) VALUES 
+('Was the faculty present?', 'yesno'),
+('Was the faculty on time?', 'mcq'),
+('Lecture delivery effectiveness?', 'rating'),
+('Was homework given?', 'yesno'),
+('Topic name for homework (if yes)', 'text'),
+('Use of proper tools for teaching?', 'yesno'),
+('Any feedback?', 'text');
+
+-- Options for MCQ and rating
+INSERT INTO question_options (question_id, option_text) VALUES
+(2, 'Yes'),
+(2, 'No'),
+(2, 'Late by 5 min'),
+(2, 'Late by 10 min'),
+(2, 'Late by 15 min'),
+(3, 'Excellent'),
+(3, 'Very Good'),
+(3, 'Good'),
+(3, 'Bad');
 INSERT INTO questions (question_text, question_type) VALUES
 ('Was the faculty present?', 'yesno'),
 ('Was the faculty on time?', 'mcq'),

@@ -43,7 +43,7 @@ if ($stmt->execute()) {
             $ins->execute();
         }
     }
-    header("Location: ../../frontend/student/profile.php?success=1");
+        header("Location: ../../frontend/student/dashboard.php?profile_updated=1");
     exit;
 } else {
     header("Location: ../../frontend/student/profile.php?error=1");

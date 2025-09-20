@@ -57,8 +57,10 @@ $assessments = $conn->query("SELECT a.*, s.subject_name FROM assessments a JOIN 
         <strong>Category:</strong> <?= htmlspecialchars($userRow['category'] ?? 'N/A') ?>
       </div>
       <div class="list-group">
-        <a class="list-group-item" href="profile.php">My Profile</a>
-        <a class="list-group-item" href="history.php">My Feedback History</a>
+  <a class="list-group-item" href="profile.php">My Profile</a>
+  <a class="list-group-item" href="history.php">My Feedback History</a>
+  <a class="list-group-item" href="verify_assessment.php">Assessment Check</a>
+  <a class="list-group-item" href="verify_event.php">Event Check</a>
       </div>
     </div>
   </div>

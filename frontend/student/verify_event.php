@@ -7,7 +7,11 @@ if(empty($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
 include("../includes/header.php");
 include("../../config.php");
 
-$res = $conn->query("SELECT * FROM events WHERE status='planned' ORDER BY date DESC");
+$user_id = $_SESSION['user_id'];
+$userRes = $conn->query("SELECT semester FROM users WHERE id=$user_id");
+$userRow = $userRes ? $userRes->fetch_assoc() : null;
+$student_semester = intval($userRow['semester'] ?? 0);
+$res = $conn->query("SELECT * FROM events WHERE status='planned' AND (semester_applicability=0 OR semester_applicability=$student_semester) ORDER BY date DESC");
 ?>
 <div class="card card-lean p-3">
   <h5>Verify Events</h5>
