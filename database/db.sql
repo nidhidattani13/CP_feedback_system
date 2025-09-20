@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
   password VARCHAR(255) NOT NULL,
   role ENUM('student','faculty','hod') NOT NULL,
   enrollment_no VARCHAR(16),
+  semester VARCHAR(1),
   sgpa1 DECIMAL(3,2),
   sgpa2 DECIMAL(3,2),
   sgpa3 DECIMAL(3,2),

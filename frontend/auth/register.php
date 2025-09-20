@@ -66,7 +66,7 @@ function updateFields() {
   enrollInput.maxLength = role === 'student' ? 11 : (role === 'faculty' ? 6 : 4);
   enrollInput.placeholder = role === 'student' ? '11-digit' : (role === 'faculty' ? '6-digit' : '4-digit');
   sgpaFields.style.display = (role === 'student') ? '' : 'none';
-  sgpaInputs.forEach(inp => { inp.required = (role === 'student'); inp.value = ''; });
+  sgpaInputs.forEach(inp => { inp.required = false; inp.value = ''; });
 }
 roleSelect.addEventListener('change', updateFields);
 document.addEventListener('DOMContentLoaded', updateFields);

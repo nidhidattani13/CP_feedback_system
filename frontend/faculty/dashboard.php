@@ -32,6 +32,23 @@ include("../includes/header.php");
         <p class="text-muted">No notices yet.</p>
       <?php endif; ?>
     </div>
+    <div class="card p-3 card-lean mt-4">
+      <h5>Recent Events</h5>
+      <?php
+      include("../../config.php");
+      $eres = $conn->query("SELECT title, date, semester_applicability FROM events ORDER BY date DESC LIMIT 5");
+      ?>
+      <ul class="list-group">
+        <?php if($eres && $eres->num_rows>0): while($e=$eres->fetch_assoc()): ?>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span><strong><?= htmlspecialchars($e['title']) ?></strong> (<?= htmlspecialchars($e['date']) ?>)</span>
+            <span class="badge bg-secondary ms-2"><?= $e['semester_applicability']==0 ? 'All' : 'Sem '.$e['semester_applicability'] ?></span>
+          </li>
+        <?php endwhile; else: ?>
+          <li class="list-group-item text-muted">No events found.</li>
+        <?php endif; ?>
+      </ul>
+    </div>
   </div>
 </div>
 <?php include("../includes/footer.php"); ?>

@@ -41,6 +41,7 @@ while($row = $res2->fetch_assoc()) $selected_subjects[] = $row['subject_id'];
         <div class="mb-2"><strong>CGPA:</strong> <?= htmlspecialchars($u['cgpa'] ?? 'N/A') ?></div>
         <div class="mb-2"><strong>Category:</strong> <?= htmlspecialchars($u['category'] ?? 'N/A') ?></div>
         <hr>
+        
         <label class="form-label">Update SGPA (Sem 1-8)</label>
         <div class="row">
           <?php for($i=1;$i<=8;$i++): ?>

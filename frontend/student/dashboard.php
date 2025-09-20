@@ -31,6 +31,15 @@ if ($now >= 17 && $subjects) {
   }
   $subjects->data_seek(0); // reset again for main loop
 }
+
+// Fetch student semester
+$userRes = $conn->query("SELECT semester, cgpa, category FROM users WHERE id=$user_id");
+$userRow = $userRes ? $userRes->fetch_assoc() : null;
+$student_semester = intval($userRow['semester'] ?? 0);
+// Fetch relevant events
+$events = $conn->query("SELECT * FROM events WHERE semester_applicability=0 OR semester_applicability=$student_semester ORDER BY date DESC");
+// Fetch relevant assessment plans
+$assessments = $conn->query("SELECT a.*, s.subject_name FROM assessments a JOIN subjects s ON a.subject_id = s.id WHERE a.semester=$student_semester ORDER BY a.week_no");
 ?>
 <div class="row">
   <div class="col-md-4">
@@ -40,12 +49,12 @@ if ($now >= 17 && $subjects) {
       <div class="mb-2">
         <strong>Enrollment No:</strong> <?= htmlspecialchars($_SESSION['enrollment_no'] ?? '') ?><br>
         <?php
-$semRes = $conn->query("SELECT semester FROM users WHERE id=$user_id");
-$semRow = $semRes ? $semRes->fetch_assoc() : null;
-?>
-<strong>Semester:</strong> <?= htmlspecialchars($semRow['semester'] ?? 'N/A') ?><br>
-        <strong>CGPA:</strong> <?= htmlspecialchars($_SESSION['cgpa'] ?? 'N/A') ?><br>
-        <strong>Category:</strong> <?= htmlspecialchars($_SESSION['category'] ?? 'N/A') ?>
+        $userRes = $conn->query("SELECT semester, cgpa, category FROM users WHERE id=$user_id");
+        $userRow = $userRes ? $userRes->fetch_assoc() : null;
+        ?>
+        <strong>Semester:</strong> <?= htmlspecialchars($userRow['semester'] ?? 'N/A') ?><br>
+        <strong>CGPA:</strong> <?= htmlspecialchars($userRow['cgpa'] ?? 'N/A') ?><br>
+        <strong>Category:</strong> <?= htmlspecialchars($userRow['category'] ?? 'N/A') ?>
       </div>
       <div class="list-group">
         <a class="list-group-item" href="profile.php">My Profile</a>
@@ -104,6 +113,59 @@ $semRow = $semRes ? $semRes->fetch_assoc() : null;
       <?php endwhile; else: ?>
         <p class="text-muted">No notices yet.</p>
       <?php endif; ?>
+    </div>
+      </br>
+    <div class="card p-3 card-lean mb-3">
+      <h5>Upcoming Events</h5>
+      <div class="table-responsive">
+        <table class="table table-bordered table-sm">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Date</th>
+              <th>Description</th>
+              <th>Semester</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php if($events && $events->num_rows>0): while($e = $events->fetch_assoc()): ?>
+            <tr>
+              <td><?= htmlspecialchars($e['title']) ?></td>
+              <td><?= htmlspecialchars($e['date']) ?></td>
+              <td><?= htmlspecialchars($e['description']) ?></td>
+              <td><?= $e['semester_applicability']==0 ? 'All' : htmlspecialchars($e['semester_applicability']) ?></td>
+            </tr>
+            <?php endwhile; else: ?>
+            <tr><td colspan="4" class="text-center text-muted">No events found.</td></tr>
+            <?php endif; ?>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card p-3 card-lean mb-3">
+      <h5>Assessment Plans</h5>
+      <div class="table-responsive">
+        <table class="table table-bordered table-sm">
+          <thead>
+            <tr>
+              <th>Subject</th>
+              <th>Title</th>
+              <th>Week No</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php if($assessments && $assessments->num_rows>0): while($a = $assessments->fetch_assoc()): ?>
+            <tr>
+              <td><?= htmlspecialchars($a['subject_name']) ?></td>
+              <td><?= htmlspecialchars($a['title']) ?></td>
+              <td><?= htmlspecialchars($a['week_no']) ?></td>
+            </tr>
+            <?php endwhile; else: ?>
+            <tr><td colspan="3" class="text-center text-muted">No assessment plans found.</td></tr>
+            <?php endif; ?>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>

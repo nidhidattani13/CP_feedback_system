@@ -7,11 +7,13 @@ if(empty($_SESSION['user_id']) || $_SESSION['role'] !== 'faculty') die("Access d
 $faculty_id = $_SESSION['user_id'];
 $title = trim($_POST['title'] ?? '');
 $week_no = intval($_POST['week_no'] ?? 0);
+$subject_id = intval($_POST['subject_id'] ?? 0);
+$semester = intval($_POST['semester'] ?? 0);
 
-if(!$title || !$week_no) die("Missing fields.");
+if(!$title || !$week_no || !$subject_id || !$semester) die("Missing fields.");
 
-$stmt = $conn->prepare("INSERT INTO assessments (faculty_id, title, week_no) VALUES (?,?,?)");
-$stmt->bind_param("isi", $faculty_id, $title, $week_no);
+$stmt = $conn->prepare("INSERT INTO assessments (faculty_id, subject_id, semester, title, week_no) VALUES (?,?,?,?,?)");
+$stmt->bind_param("iiisi", $faculty_id, $subject_id, $semester, $title, $week_no);
 if($stmt->execute()){
     header("Location: " . APP_BASE . "/frontend/faculty/dashboard.php");
     exit;

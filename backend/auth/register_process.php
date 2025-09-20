@@ -33,7 +33,7 @@ if (!$name || !$email || !$password) {
 
 $hashed = password_hash($password, PASSWORD_DEFAULT);
 
-$stmt = $conn->prepare("INSERT INTO users (name,email,password,role,enrollment_no,sgpa1,sgpa2,sgpa3,sgpa4,sgpa5,sgpa6,sgpa7,sgpa8) VALUES (?,?,?,?,?,?,?,?,?, ?, ?, ?, ?, ?)");
+$stmt = $conn->prepare("INSERT INTO users (name,email,password,role,enrollment_no,sgpa1,sgpa2,sgpa3,sgpa4,sgpa5,sgpa6,sgpa7,sgpa8) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)");
 $stmt->bind_param(
     "sssssdddddddd",
     $name, $email, $hashed, $role, $enrollment_no,
