@@ -44,15 +44,16 @@ if(isset($_GET['export_csv']) && isset($_GET['subject_id'])) {
             </h2>
             <div id="collapse_<?= $sub['id'] ?>" class="accordion-collapse collapse" aria-labelledby="heading_<?= $sub['id'] ?>" data-bs-parent="#accordion_<?= $sub['id'] ?>">
               <div class="accordion-body">
-                <a href="?export_csv=1&subject_id=<?= $sub['id'] ?>" class="btn btn-sm btn-outline-secondary mb-2">Export CSV</a>
+                <!-- <a href="?export_csv=1&subject_id=<?= $sub['id'] ?>" class="btn btn-sm btn-outline-secondary mb-2">Export CSV</a> -->
                 <?php
                 $sid = $sub['id'];
                 // Summary card
-                $total_feedbacks = $conn->query("SELECT COUNT(*) as cnt FROM feedback_responses WHERE subject_id=$sid AND faculty_id=$faculty_id")->fetch_assoc()['cnt'];
-                $avg_rating = $conn->query("SELECT AVG(CASE WHEN question_id=3 THEN response END) as avg_rating FROM feedback_responses WHERE subject_id=$sid AND faculty_id=$faculty_id")->fetch_assoc()['avg_rating'];
+                $total_students = $conn->query("SELECT COUNT(DISTINCT student_id) as cnt FROM student_subjects WHERE subject_id=$sid")->fetch_assoc()['cnt'];
+                $avg_rating_res = $conn->query("SELECT AVG(CAST(response AS DECIMAL(5,2))) as avg_rating FROM feedback_responses WHERE subject_id=$sid AND faculty_id=$faculty_id AND question_id=3 AND response REGEXP '^[0-9]+$'");
+                $avg_rating = $avg_rating_res ? $avg_rating_res->fetch_assoc()['avg_rating'] : null;
                 echo '<div class="row mb-3">';
-                echo '<div class="col-md-4"><div class="card bg-light p-2"><strong>Total Feedbacks:</strong> ' . $total_feedbacks . '</div></div>';
-                echo '<div class="col-md-4"><div class="card bg-light p-2"><strong>Avg. Delivery Rating:</strong> ' . ($avg_rating ? round($avg_rating,2) : 'N/A') . '</div></div>';
+                echo '<div class="col-md-4"><div class="card bg-light p-2"><strong>Total Students:</strong> ' . $total_students . '</div></div>';
+                // echo '<div class="col-md-4"><div class="card bg-light p-2"><strong>Avg. Delivery Rating:</strong> ' . ($avg_rating !== null && $avg_rating !== '' ? round($avg_rating,2) : 'N/A') . '</div></div>';
                 echo '</div>';
                 // Fetch questions
                 $qres = $conn->query("SELECT id, question_text, question_type FROM questions ORDER BY id");

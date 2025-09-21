@@ -14,10 +14,10 @@ $subjects = $conn->query("SELECT id, subject_name, semester FROM subjects WHERE 
 $filter_sem = isset($_GET['filter_sem']) ? intval($_GET['filter_sem']) : 0;
 $filter_sub = isset($_GET['filter_sub']) ? intval($_GET['filter_sub']) : 0;
 // Build query for assessments
-$assess_query = "SELECT a.*, s.subject_name FROM assessments a JOIN subjects s ON a.subject_id = s.id WHERE a.faculty_id=$faculty_id";
-if($filter_sem) $assess_query .= " AND a.semester=$filter_sem";
+$assess_query = "SELECT a.*, s.subject_name, s.semester FROM assessments a JOIN subjects s ON a.subject_id = s.id WHERE 1";
+if($filter_sem) $assess_query .= " AND a.semester_applicability=$filter_sem";
 if($filter_sub) $assess_query .= " AND a.subject_id=$filter_sub";
-$assess_query .= " ORDER BY a.semester, a.subject_id, a.week_no";
+$assess_query .= " ORDER BY a.semester_applicability, a.subject_id, a.week_no";
 $assessments = $conn->query($assess_query);
 
 // Event form and history

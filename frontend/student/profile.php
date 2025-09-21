@@ -21,10 +21,10 @@ while($row = $res2->fetch_assoc()) $selected_subjects[] = $row['subject_id'];
   <div class="col-md-7">
     <div class="card card-lean p-4">
       <h5>My Profile</h5>
-        <div class="mb-3">
+        <!-- <div class="mb-3">
           <a href="verify_assessment.php" class="btn btn-outline-primary btn-sm me-2">Verify Assessments</a>
           <a href="verify_event.php" class="btn btn-outline-secondary btn-sm">Verify Events</a>
-        </div>
+        </div> -->
       <form method="POST" action="../../backend/student/update_profile.php">
         <div class="mb-2">
           <label class="form-label">Name</label>

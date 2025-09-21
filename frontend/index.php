@@ -5,7 +5,7 @@ include("includes/header.php");
 <div class="container py-5">
   <div class="row mb-4">
     <div class="col text-center">
-      <h1 class="display-4 fw-bold text-primary mb-2">CP Feedback System</h1>
+      <h1 class="display-4 fw-bold text-primary mb-2">Feedback System</h1>
       <p class="lead text-muted">A modern platform for academic feedback, assessment, and event management. Empowering students, faculty, and HODs to collaborate and improve the learning experience.</p>
     </div>
   </div>

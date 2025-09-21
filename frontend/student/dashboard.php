@@ -39,7 +39,26 @@ $student_semester = intval($userRow['semester'] ?? 0);
 // Fetch relevant events
 $events = $conn->query("SELECT * FROM events WHERE semester_applicability=0 OR semester_applicability=$student_semester ORDER BY date DESC");
 // Fetch relevant assessment plans
-$assessments = $conn->query("SELECT a.*, s.subject_name FROM assessments a JOIN subjects s ON a.subject_id = s.id WHERE a.semester=$student_semester ORDER BY a.week_no");
+$subject_ids = [];
+if ($subjects && $subjects->num_rows > 0) {
+  $subjects->data_seek(0);
+  while($sub = $subjects->fetch_assoc()) {
+    $subject_ids[] = intval($sub['subject_id']);
+  }
+  $subjects->data_seek(0);
+}
+$subject_ids_str = implode(',', $subject_ids);
+$assessments = null;
+if (!empty($subject_ids_str)) {
+  $assessments = $conn->query(
+    "SELECT a.*, s.subject_name 
+     FROM assessments a 
+     JOIN subjects s ON a.subject_id = s.id 
+     WHERE a.subject_id IN ($subject_ids_str) 
+       AND (a.semester_applicability = 0 OR a.semester_applicability = $student_semester)
+     ORDER BY a.week_no"
+  );
+}
 ?>
 <div class="row">
   <div class="col-md-4">

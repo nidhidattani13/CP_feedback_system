@@ -76,7 +76,7 @@ if ($edit_id) {
           <li class="list-group-item d-flex justify-content-between align-items-center">
             <?php if($edit_mode && $edit_id === $row['id']): ?>
               <!-- Edit mode for subject -->
-              <form method="POST" class="d-flex w-100 align-items-end">
+              <form method="POST" action="subjects.php?edit=<?= $row['id'] ?>" class="d-flex w-100 align-items-end">
                 <input type="hidden" name="edit_id" value="<?= $row['id'] ?>">
                 <input type="text" name="subject_name" id="editSubjectInput" class="form-control me-2" value="<?= htmlspecialchars($row['subject_name']) ?>" required style="max-width: 40%">
                 <select name="semester" class="form-select me-2" required style="max-width: 30%">
@@ -92,7 +92,7 @@ if ($edit_id) {
             <?php else: ?>
               <span><?= htmlspecialchars($row['subject_name']) ?> <span class="badge bg-secondary ms-2">Sem <?= $row['semester'] ?></span></span>
               <span>
-                <a href="subjects.php?edit=<?= $row['id'] ?>" class="btn btn-sm btn-warning me-1">Edit</a>
+                <!-- <a href="subjects.php?edit=<?= $row['id'] ?>" class="btn btn-sm btn-warning me-1">Edit</a> -->
                 <a href="subjects.php?delete=<?= $row['id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Delete this subject?')">Delete</a>
               </span>
             <?php endif; ?>
