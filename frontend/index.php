@@ -24,7 +24,7 @@ include("includes/header.php");
       <div class="card shadow h-100">
         <div class="card-body text-center">
           <h5 class="card-title">Faculty Portal</h5>
-          <p class="card-text">Add subjects, view feedback, manage assessments, and events for your classes.</p>
+          <p class="card-text">Add subjects, view feedback, manage assessments, and events for your classes.           </p><br>
           <a href="auth/login.php?role=faculty" class="btn btn-success w-100">Faculty Login</a>
           <a href="auth/register.php" class="btn btn-link w-100">Register</a>
         </div>
@@ -34,7 +34,7 @@ include("includes/header.php");
       <div class="card shadow h-100">
         <div class="card-body text-center">
           <h5 class="card-title">HOD Portal</h5>
-          <p class="card-text">View analytics, manage reports, notices, students, and faculty lists.</p>
+          <p class="card-text">View analytics, manage reports, notices, students, and faculty lists.</p><br>
           <a href="auth/login.php?role=hod" class="btn btn-danger w-100">HOD Login</a>
           <a href="auth/register.php" class="btn btn-link w-100">Register</a>
         </div>

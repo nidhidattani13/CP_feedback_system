@@ -12,7 +12,7 @@ include("../includes/header.php");
       <h5>HOD Panel</h5>
       <div class="list-group">
   <a class="list-group-item" href="reports.php">View Reports</a>
-  <a class="list-group-item" href="../feedback/manage_questions.php">Manage Feedback Questions</a>
+  <!-- <a class="list-group-item" href="../feedback/manage_questions.php">Manage Feedback Questions</a> -->
   <a class="list-group-item" href="manage_users.php">Student & Faculty List</a>
       </div>
     </div>
