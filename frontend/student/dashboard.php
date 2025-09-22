@@ -24,7 +24,7 @@ while($row = $res->fetch_assoc()) $done[] = $row['subject_id'];
 
 // Calculate pending feedback count
 $pending = 0;
-if ($now >= 17 && $subjects) {
+if ($now >= 13 && $subjects) {
   $subjects->data_seek(0); // reset pointer
   while($sub = $subjects->fetch_assoc()) {
     if (!in_array($sub['subject_id'], $done)) $pending++;
@@ -90,16 +90,16 @@ if (!empty($subject_ids_str)) {
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
     <?php endif; ?>
-    <?php if($now >= 17 && $pending > 0): ?>
+    <?php if($now >= 13 && $pending > 0): ?>
       <div class="alert alert-warning alert-dismissible fade show" role="alert">
         <strong>Reminder:</strong> You have <?= $pending ?> pending feedback<?= $pending > 1 ? 's' : '' ?> to submit today!
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
     <?php endif; ?>
     <div class="card p-3 card-lean mb-3">
-      <h5>Daily Feedback (after 5pm)</h5>
-      <?php if($now < 17): ?>
-        <div class="alert alert-info">Feedback will be available after 5pm.</div>
+      <h5>Daily Feedback (after 1pm)</h5>
+      <?php if($now < 13): ?>
+        <div class="alert alert-info">Feedback will be available after 1pm.</div>
       <?php else: ?>
         <?php if($subjects->num_rows == 0): ?>
           <div class="alert alert-warning">No subjects selected for your semester. Please update your profile.</div>

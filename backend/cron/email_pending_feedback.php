@@ -2,7 +2,7 @@
 // backend/cron/email_pending_feedback.php
 include_once("../../config.php");
 $now = intval(date('H'));
-if ($now < 17) exit; // Only run after 5pm
+if ($now < 13) exit; // Only run after 5pm
 $today = date('Y-m-d');
 
 // Get all semesters and categories
