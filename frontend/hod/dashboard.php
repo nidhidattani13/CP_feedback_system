@@ -5,14 +5,24 @@ if(empty($_SESSION['user_id']) || $_SESSION['role'] !== 'hod') {
   header("Location: " . APP_BASE . "/frontend/auth/login.php"); exit;
 }
 include("../includes/header.php");
+include("../../config.php");
+// Fetch selected students for today
+$today = date('Y-m-d');
+$selRes = $conn->query(
+  "SELECT u.id, u.name, u.enrollment_no 
+   FROM selected_students ss 
+   JOIN users u ON ss.student_id = u.id 
+   WHERE ss.selected_date = '$today'"
+);
 ?>
 <div class="row">
   <div class="col-md-4">
     <div class="card p-3 card-lean">
       <h5>HOD Panel</h5>
       <div class="list-group">
-  <a class="list-group-item" href="reports.php">View Reports</a>
-  <a class="list-group-item" href="manage_users.php">Student & Faculty List</a>
+        <a class="list-group-item" href="reports.php">View Reports</a>
+        <a class="list-group-item" href="manage_users.php">Student & Faculty List</a>
+        <a class="list-group-item" href="selected_students.php">Selected Students for Today</a>
       </div>
     </div>
   </div>
@@ -32,7 +42,6 @@ include("../includes/header.php");
       </form>
     </div>
     <?php
-    include("../../config.php");
     $notices = $conn->query("SELECT n.*, u.name AS author FROM notices n JOIN users u ON u.id=n.created_by ORDER BY n.created_at DESC LIMIT 10");
     ?>
     <div class="card p-3 card-lean">

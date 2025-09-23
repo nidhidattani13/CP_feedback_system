@@ -7,7 +7,6 @@ if(empty($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
 include("../includes/header.php");
 include("../../config.php");
 $user_id = $_SESSION['user_id'];
-$now = intval(date('H'));
 // Fetch selected subjects with faculty
 $q = "SELECT s.id as subject_id, s.subject_name, s.semester, u.name as faculty_name, u.id as faculty_id
       FROM student_subjects ss
@@ -16,15 +15,33 @@ $q = "SELECT s.id as subject_id, s.subject_name, s.semester, u.name as faculty_n
       WHERE ss.student_id = $user_id
       ORDER BY s.semester, s.subject_name";
 $subjects = $conn->query($q);
+if ($subjects === false) {
+  echo '<div class="alert alert-danger">Error fetching subjects: ' . htmlspecialchars($conn->error) . '</div>';
+  // Optionally, stop further execution
+  exit;
+}
 // Fetch today's feedbacks
 $today = date('Y-m-d');
 $done = [];
-$res = $conn->query("SELECT subject_id FROM feedback_responses WHERE student_id=$user_id AND DATE(created_at)='$today'");
-while($row = $res->fetch_assoc()) $done[] = $row['subject_id'];
+
+// Check if feedback_responses table exists
+$tableCheck = $conn->query("SHOW TABLES LIKE 'feedback_responses'");
+if ($tableCheck && $tableCheck->num_rows == 1) {
+  $res = $conn->query("SELECT subject_id FROM feedback_responses WHERE student_id=$user_id AND DATE(created_at)='$today'");
+  if ($res === false) {
+    echo '<div class="alert alert-danger">Error fetching feedback responses: ' . htmlspecialchars($conn->error) . '</div>';
+    exit;
+  }
+  while($row = $res->fetch_assoc()) $done[] = $row['subject_id'];
+} else {
+  echo '<div class="alert alert-danger">The feedback_responses table does not exist. Please contact the administrator.</div>';
+  // Optionally, stop further execution
+  exit;
+}
 
 // Calculate pending feedback count
 $pending = 0;
-if ($now >= 13 && $subjects) {
+if ($subjects) {
   $subjects->data_seek(0); // reset pointer
   while($sub = $subjects->fetch_assoc()) {
     if (!in_array($sub['subject_id'], $done)) $pending++;
@@ -90,36 +107,32 @@ if (!empty($subject_ids_str)) {
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
     <?php endif; ?>
-    <?php if($now >= 13 && $pending > 0): ?>
+    <?php if($pending > 0): ?>
       <div class="alert alert-warning alert-dismissible fade show" role="alert">
         <strong>Reminder:</strong> You have <?= $pending ?> pending feedback<?= $pending > 1 ? 's' : '' ?> to submit today!
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
     <?php endif; ?>
     <div class="card p-3 card-lean mb-3">
-      <h5>Daily Feedback (after 1pm)</h5>
-      <?php if($now < 13): ?>
-        <div class="alert alert-info">Feedback will be available after 1pm.</div>
+      <h5>Daily Feedback</h5>
+      <?php if($subjects->num_rows == 0): ?>
+        <div class="alert alert-warning">No subjects selected for your semester. Please update your profile.</div>
       <?php else: ?>
-        <?php if($subjects->num_rows == 0): ?>
-          <div class="alert alert-warning">No subjects selected for your semester. Please update your profile.</div>
-        <?php else: ?>
-          <ul class="list-group">
-          <?php while($sub = $subjects->fetch_assoc()): ?>
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-              <div>
-                <strong><?= htmlspecialchars($sub['subject_name']) ?></strong>
-                <span class="text-muted small ms-2">Faculty: <?= htmlspecialchars($sub['faculty_name']) ?></span>
-              </div>
-              <?php if(in_array($sub['subject_id'], $done)): ?>
-                <span class="badge bg-success">Already submitted</span>
-              <?php else: ?>
-                <a href="feedback_form.php?subject_id=<?= $sub['subject_id'] ?>&faculty_id=<?= $sub['faculty_id'] ?>" class="btn btn-sm btn-primary">Fill Feedback</a>
-              <?php endif; ?>
-            </li>
-          <?php endwhile; ?>
-          </ul>
-        <?php endif; ?>
+        <ul class="list-group">
+        <?php while($sub = $subjects->fetch_assoc()): ?>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <strong><?= htmlspecialchars($sub['subject_name']) ?></strong>
+              <span class="text-muted small ms-2">Faculty: <?= htmlspecialchars($sub['faculty_name']) ?></span>
+            </div>
+            <?php if(in_array($sub['subject_id'], $done)): ?>
+              <span class="badge bg-success">Already submitted</span>
+            <?php else: ?>
+              <a href="feedback_form.php?subject_id=<?= $sub['subject_id'] ?>&faculty_id=<?= $sub['faculty_id'] ?>" class="btn btn-sm btn-primary">Fill Feedback</a>
+            <?php endif; ?>
+          </li>
+        <?php endwhile; ?>
+        </ul>
       <?php endif; ?>
     </div>
     <?php include("../../config.php"); $nres = $conn->query("SELECT title, body, created_at FROM notices ORDER BY created_at DESC LIMIT 5"); ?>
@@ -186,6 +199,11 @@ if (!empty($subject_ids_str)) {
             <?php endif; ?>
           </tbody>
         </table>
+      </div>
+    </div>
+  </div>
+</div>
+<?php include("../includes/footer.php"); ?>
       </div>
     </div>
   </div>

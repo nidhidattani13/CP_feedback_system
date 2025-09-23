@@ -24,7 +24,7 @@ if ($role === 'student') {
         if (!valid_sgpa($sgpa)) die('SGPA values must be between 0 and 10.');
     }
 } elseif ($role === 'faculty') {
-    if (strlen($enrollment_no) !== 6) die('Enrollment number must be 6 digits for faculty.');
+    if (strlen($enrollment_no) !== 4) die('Enrollment number must be 4 digits for faculty.');
 } elseif ($role === 'hod') {
     if (strlen($enrollment_no) !== 4) die('Enrollment number must be 4 digits for HOD.');
 }

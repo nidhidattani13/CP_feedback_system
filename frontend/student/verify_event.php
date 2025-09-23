@@ -15,6 +15,12 @@ $res = $conn->query("SELECT * FROM events WHERE status='planned' AND (semester_a
 ?>
 <div class="card card-lean p-3">
   <h5>Verify Events</h5>
+  <?php if(isset($_GET['success'])): ?>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      Event verification submitted!
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  <?php endif; ?>
   <?php while($r = $res->fetch_assoc()): ?>
     <div class="d-flex justify-content-between align-items-start border rounded p-2 mb-2">
       <div>

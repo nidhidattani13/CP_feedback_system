@@ -30,8 +30,52 @@ $subjectList = $conn->query("SELECT id, subject_name FROM subjects ORDER BY subj
 .kpi-card { background: linear-gradient(135deg,#f8fafc,#eef2ff); border: 1px solid #e5e7eb; }
 .badge-tier { font-size: 12px; }
 .progress { height: 10px; }
+.chart-canvas { width: 100% !important; max-width: 600px; height: 300px !important; display: block; margin-bottom: 20px; }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+window.chartInstances = {};
+function renderBarChart(chartId, labels, data) {
+  // Destroy previous chart instance if exists
+  if(window.chartInstances[chartId]) {
+    window.chartInstances[chartId].destroy();
+  }
+  const ctx = document.getElementById(chartId).getContext('2d');
+  window.chartInstances[chartId] = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Responses (%)',
+        data: data,
+        backgroundColor: [
+          'rgba(99,102,241,0.7)',
+          'rgba(16,185,129,0.7)',
+          'rgba(239,68,68,0.7)',
+          'rgba(253,224,71,0.7)',
+          'rgba(59,130,246,0.7)'
+        ],
+        borderRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {legend: {display: false}},
+      scales: {
+        y: {
+          beginAtZero: true,
+          max: 100,
+          title: {display: true, text: '%'},
+          ticks: {stepSize: 10}
+        }
+      }
+    }
+  });
+}
+document.addEventListener("DOMContentLoaded", function() {
+  // Chart rendering will be triggered by PHP below
+});
+</script>
 <div class="row justify-content-center">
   <div class="col-md-11">
     <div class="card card-lean p-4">
@@ -76,18 +120,13 @@ $subjectList = $conn->query("SELECT id, subject_name FROM subjects ORDER BY subj
         <?php while($sub = $subjects->fetch_assoc()): ?>
           <?php
           $sid = intval($sub['id']);
-          // Overall badge based on weighted averages across questions (simple heuristic)
-          $totalScore = 0; $maxScore = 0;
-          // Delivery effectiveness (question_id = 3)
-          $avgQual = 0; // No content quality question, so set to 0
-          $qEff = $conn->query("SELECT response, COUNT(*) cnt FROM feedback_responses WHERE subject_id=$sid AND question_id=3 GROUP BY response");
-          $map5 = ['Excellent'=>5,'Very Good'=>4,'Good'=>3,'Bad'=>1,'Very Bad'=>1];
-          $effScore = 0; $effCount = 0;
-          while($r = $qEff->fetch_assoc()){ $effScore += ($map5[$r['response']] ?? 0) * intval($r['cnt']); $effCount += intval($r['cnt']); }
-          if($effCount>0){ $avgEff = $effScore/$effCount; $totalScore += $avgEff; $maxScore += 5; } else { $avgEff = 0; }
+          // Presence yes-rate (question_id = 1)
+          $qPres = $conn->query("SELECT response, COUNT(*) cnt FROM feedback_responses WHERE subject_id=$sid AND question_id=1 GROUP BY response");
+          $yes=0;$total=0; while($r=$qPres->fetch_assoc()){ $total+=intval($r['cnt']); if(strtolower($r['response'])==='yes') $yes+=intval($r['cnt']); }
+          $presence = $total>0 ? round(($yes/$total)*100) : 0;
+
           // Punctuality (question_id = 2)
           $qTime = $conn->query("SELECT response, COUNT(*) cnt FROM feedback_responses WHERE subject_id=$sid AND question_id=2 GROUP BY response");
-          // Update this map to match your actual response values
           $timeMap = [
             'On time' => 100,
             '5 min late' => 75,
@@ -98,10 +137,7 @@ $subjectList = $conn->query("SELECT id, subject_name FROM subjects ORDER BY subj
           $timeScore=0; $timeCount=0;
           while($r = $qTime->fetch_assoc()){ $timeScore += ($timeMap[$r['response']] ?? 0) * intval($r['cnt']); $timeCount += intval($r['cnt']); }
           $punctuality = $timeCount>0 ? round($timeScore/$timeCount) : 0;
-          // Presence yes-rate (question_id = 1)
-          $qPres = $conn->query("SELECT response, COUNT(*) cnt FROM feedback_responses WHERE subject_id=$sid AND question_id=1 GROUP BY response");
-          $yes=0;$total=0; while($r=$qPres->fetch_assoc()){ $total+=intval($r['cnt']); if(strtolower($r['response'])==='yes') $yes+=intval($r['cnt']); }
-          $presence = $total>0 ? round(($yes/$total)*100) : 0;
+
           // Content quality (question_id = 4)
           $qQual = $conn->query("SELECT response, COUNT(*) cnt FROM feedback_responses WHERE subject_id=$sid AND question_id=4 GROUP BY response");
           $qualMap = [
@@ -112,12 +148,27 @@ $subjectList = $conn->query("SELECT id, subject_name FROM subjects ORDER BY subj
           while($r = $qQual->fetch_assoc()){
             $score = $qualMap[$r['response']] ?? 0;
             $qualScore += $score * intval($r['cnt']);
-            if($score > 0) $qualCount += intval($r['cnt']);
+            $qualCount += intval($r['cnt']);
           }
           $avgQual = $qualCount>0 ? $qualScore/$qualCount : 0;
-          if($qualCount>0){ $totalScore += $avgQual; $maxScore += 5; }
-          // Determine badge
-          $overallPct = $maxScore>0 ? round(($totalScore/$maxScore)*100) : 0;
+          $qualPct = $qualCount>0 ? round(($avgQual/5)*100) : 0;
+
+          // Delivery effectiveness (question_id = 3)
+          $qEff = $conn->query("SELECT response, COUNT(*) cnt FROM feedback_responses WHERE subject_id=$sid AND question_id=3 GROUP BY response");
+          $map5 = ['Excellent'=>5,'Very Good'=>4,'Good'=>3,'Bad'=>1,'Very Bad'=>1];
+          $effScore = 0; $effCount = 0;
+          while($r = $qEff->fetch_assoc()){ $effScore += ($map5[$r['response']] ?? 0) * intval($r['cnt']); $effCount += intval($r['cnt']); }
+          $avgEff = $effCount>0 ? $effScore/$effCount : 0;
+          $effPct = $effCount>0 ? round(($avgEff/5)*100) : 0;
+
+          // Weighted overall calculation
+          $overallPct = round(
+            ($qualPct * 0.35) +
+            ($effPct * 0.35) +
+            ($presence * 0.15) +
+            ($punctuality * 0.15)
+          );
+
           $tier = $overallPct>=85?'🏆 Gold':($overallPct>=70?'🥈 Silver':($overallPct>=55?'🥉 Bronze':'🔧 Improve'));
           ?>
           <div class="accordion-item mb-2">
@@ -140,11 +191,11 @@ $subjectList = $conn->query("SELECT id, subject_name FROM subjects ORDER BY subj
                     <div class="mb-2">Punctuality: <?= $timeCount > 0 ? $punctuality . '%' : 'N/A' ?>
                       <div class="progress"><div class="progress-bar bg-info" role="progressbar" style="width: <?= $timeCount > 0 ? $punctuality : 0 ?>%"></div></div>
                     </div>
-                    <div class="mb-2">Content Quality Avg: <?= $qualCount > 0 ? number_format($avgQual,2) . '/5' : 'N/A' ?>
-                      <div class="progress"><div class="progress-bar bg-warning" role="progressbar" style="width: <?= $qualCount > 0 ? intval(($avgQual/5)*100) : 0 ?>%"></div></div>
+                    <div class="mb-2">Content Quality Avg: <?= $qualCount > 0 ? $qualPct . '%' : 'N/A' ?>
+                      <div class="progress"><div class="progress-bar bg-warning" role="progressbar" style="width: <?= $qualCount > 0 ? $qualPct : 0 ?>%"></div></div>
                     </div>
-                    <div class="mb-2">Delivery Effectiveness Avg: <?= $effCount > 0 ? number_format($avgEff,2) . '/5' : 'N/A' ?>
-                      <div class="progress"><div class="progress-bar bg-danger" role="progressbar" style="width: <?= $effCount > 0 ? intval(($avgEff/5)*100) : 0 ?>%"></div></div>
+                    <div class="mb-2">Delivery Effectiveness Avg: <?= $effCount > 0 ? $effPct . '%' : 'N/A' ?>
+                      <div class="progress"><div class="progress-bar bg-danger" role="progressbar" style="width: <?= $effCount > 0 ? $effPct : 0 ?>%"></div></div>
                     </div>
                   </div>
                 </div>
@@ -157,12 +208,23 @@ $subjectList = $conn->query("SELECT id, subject_name FROM subjects ORDER BY subj
                   $qtext = $q['question_text'];
                   echo '<div class="mb-3"><strong>' . htmlspecialchars($qtext) . '</strong><br>';
                   if(in_array($qtype, ['yesno','mcq','rating'])) {
+                    // Calculate percentage for each response
                     $rres = $conn->query("SELECT response, COUNT(*) as cnt FROM feedback_responses WHERE subject_id=$sid AND question_id=$qid GROUP BY response ORDER BY cnt DESC");
-                    $labels = []; $data = [];
-                    while($r = $rres->fetch_assoc()) { $labels[] = $r['response']; $data[] = intval($r['cnt']); }
+                    $labels = []; $data = []; $totalCnt = 0; $raw = [];
+                    while($r = $rres->fetch_assoc()) { $raw[] = $r; $totalCnt += intval($r['cnt']); }
+                    foreach($raw as $r) {
+                      $labels[] = $r['response'];
+                      $pct = $totalCnt > 0 ? round(($r['cnt']/$totalCnt)*100, 2) : 0;
+                      $data[] = $pct;
+                    }
                     $chartId = 'chart_' . $sid . '_' . $qid;
-                    echo '<canvas id="' . $chartId . '" height="80"></canvas>';
-                    echo "<script>new Chart(document.getElementById('$chartId').getContext('2d'), {type: 'bar', data: {labels: " . json_encode($labels) . ", datasets: [{label: 'Responses', data: " . json_encode($data) . ", backgroundColor: 'rgba(99,102,241,0.6)'}]}, options: {plugins: {legend: {display: false}}}});</script>";
+                    echo '<canvas id="' . $chartId . '" class="chart-canvas"></canvas>';
+                    // Output JS to render chart after DOM is ready
+                    echo "<script>
+                      document.addEventListener('DOMContentLoaded', function() {
+                        renderBarChart('$chartId', " . json_encode($labels) . ", " . json_encode($data) . ");
+                      });
+                    </script>";
                   } else {
                     $rres = $conn->query("SELECT response FROM feedback_responses WHERE subject_id=$sid AND question_id=$qid ORDER BY created_at DESC LIMIT 10");
                     echo '<ul class="mb-0">';

@@ -79,13 +79,13 @@ const sgpaHelp = document.getElementById('sgpaHelp');
 function updateFields() {
   const role = roleSelect.value;
   enrollInput.value = '';
-  enrollInput.maxLength = role === 'student' ? 11 : (role === 'faculty' ? 6 : 4);
-  enrollInput.placeholder = role === 'student' ? '11-digit' : (role === 'faculty' ? '6-digit' : '4-digit');
+  enrollInput.maxLength = role === 'student' ? 11 : 4;
+  enrollInput.placeholder = role === 'student' ? '11-digit' : '4-digit';
   sgpaFields.style.display = (role === 'student') ? '' : 'none';
   sgpaInputs.forEach(inp => { inp.required = false; inp.value = ''; });
-    semesterField.style.display = (role === 'student') ? '' : 'none';
-    semesterSelect.required = (role === 'student');
-    if (role !== 'student') semesterSelect.value = '';
+  semesterField.style.display = (role === 'student') ? '' : 'none';
+  semesterSelect.required = (role === 'student');
+  if (role !== 'student') semesterSelect.value = '';
 }
 roleSelect.addEventListener('change', updateFields);
 document.addEventListener('DOMContentLoaded', updateFields);
@@ -108,12 +108,8 @@ document.querySelector('form').addEventListener('submit', function(e) {
     enrollHelp.textContent = 'Enrollment number must be 11 digits for students.';
     enrollInput.classList.add('is-invalid');
     valid = false;
-  } else if (role === 'faculty' && enrollVal.length !== 6) {
-    enrollHelp.textContent = 'Enrollment number must be 6 digits for faculty.';
-    enrollInput.classList.add('is-invalid');
-    valid = false;
-  } else if (role === 'hod' && enrollVal.length !== 4) {
-    enrollHelp.textContent = 'Enrollment number must be 4 digits for HOD.';
+  } else if ((role === 'faculty' || role === 'hod') && enrollVal.length !== 4) {
+    enrollHelp.textContent = 'Enrollment number must be 4 digits for faculty and HOD.';
     enrollInput.classList.add('is-invalid');
     valid = false;
   } else {
@@ -129,6 +125,10 @@ document.querySelector('form').addEventListener('submit', function(e) {
         inp.classList.remove('is-invalid');
       }
     }
+  }
+  if (!valid) e.preventDefault();
+});
+</script>
   }
   if (!valid) e.preventDefault();
 });

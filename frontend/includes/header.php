@@ -27,9 +27,28 @@ if (!defined('APP_BASE')) {
         if(session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
         if(!empty($_SESSION['user_id'])) {
           $role = $_SESSION['role'] ?? 'student';
-          $dash = APP_BASE.'/frontend/'.$role.'/dashboard.php';
-          echo '<li class="nav-item me-2"><a class="btn btn-light btn-sm" href="'.$dash.'">Dashboard</a></li>';
-          echo '<li class="nav-item"><a class="btn btn-outline-light btn-sm" href="'.APP_BASE.'/backend/auth/logout_process.php">Logout</a></li>';
+          if ($role === 'student') {
+            // Student dashboard links
+            echo '<li class="nav-item"><a class="nav-link text-light" href="'.APP_BASE.'/frontend/student/dashboard.php">Dashboard</a></li>';
+            echo '<li class="nav-item"><a class="nav-link text-light" href="'.APP_BASE.'/frontend/student/profile.php">My Profile</a></li>';
+            echo '<li class="nav-item"><a class="nav-link text-light" href="'.APP_BASE.'/frontend/student/verify_assessment.php">Assessment Check</a></li>';
+            echo '<li class="nav-item"><a class="nav-link text-light" href="'.APP_BASE.'/frontend/student/verify_event.php">Event Check</a></li>';
+            echo '<li class="nav-item"><a class="nav-link text-light" href="'.APP_BASE.'/frontend/student/history.php">My Feedback History</a></li>';
+          } elseif ($role === 'faculty') {
+            // Faculty dashboard links
+            echo '<li class="nav-item"><a class="nav-link text-light" href="'.APP_BASE.'/frontend/faculty/dashboard.php">Dashboard</a></li>';
+            echo '<li class="nav-item"><a class="nav-link text-light" href="'.APP_BASE.'/frontend/faculty/add_assessment.php">Add Assessment</a></li>';
+            echo '<li class="nav-item"><a class="nav-link text-light" href="'.APP_BASE.'/frontend/faculty/view_feedback.php">View Feedback</a></li>';
+            echo '<li class="nav-item"><a class="nav-link text-light" href="'.APP_BASE.'/frontend/faculty/subjects.php">Manage Subjects</a></li>';
+            echo '<li class="nav-item"><a class="nav-link text-light" href="'.APP_BASE.'/frontend/faculty/events.php">Add Events</a></li>';
+          } elseif ($role === 'hod') {
+            // HOD dashboard links
+            echo '<li class="nav-item"><a class="nav-link text-light" href="'.APP_BASE.'/frontend/hod/dashboard.php">Dashboard</a></li>';
+            echo '<li class="nav-item"><a class="nav-link text-light" href="'.APP_BASE.'/frontend/hod/manage_users.php">Manage Users</a></li>';
+            echo '<li class="nav-item"><a class="nav-link text-light" href="'.APP_BASE.'/frontend/hod/reports.php">View Feedback</a></li>';
+            echo '<li class="nav-item"><a class="nav-link text-light" href="'.APP_BASE.'/frontend/hod/selected_students.php">Student List</a></li>';
+          }
+          echo '<li class="nav-item"><a class="btn btn-outline-light btn-sm ms-2" href="'.APP_BASE.'/backend/auth/logout_process.php">Logout</a></li>';
         } else {
           echo '<li class="nav-item me-2"><a class="btn btn-outline-light btn-sm" href="'.APP_BASE.'/frontend/auth/login.php">Login</a></li>';
           echo '<li class="nav-item"><a class="btn btn-light btn-sm" href="'.APP_BASE.'/frontend/auth/register.php">Register</a></li>';
@@ -38,5 +57,5 @@ if (!defined('APP_BASE')) {
       </ul>
     </div>
   </div>
-  </nav>
+</nav>
 <div class="container my-4">

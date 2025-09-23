@@ -76,6 +76,7 @@ DELIMITER ;
 
 -- Procedure: Random daily selection of n students
 DELIMITER //
+DROP PROCEDURE IF EXISTS generate_daily_selection;
 CREATE PROCEDURE generate_daily_selection(IN n INT)
 BEGIN
   DELETE FROM daily_selected_students WHERE selection_date = CURDATE();
@@ -152,6 +153,15 @@ CREATE TABLE IF NOT EXISTS student_subjects (
   subject_id INT NOT NULL,
   FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE
+);
+
+CREATE TABLE event_verifications (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  event_id INT NOT NULL,
+  student_id INT NOT NULL,
+  verified_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
+  FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- Optionally insert sample accounts (use register page alternatively)

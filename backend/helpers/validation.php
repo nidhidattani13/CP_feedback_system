@@ -11,7 +11,7 @@ function is_rating($v): bool {
 
 function valid_enrollment($enroll, $role) {
     if ($role === 'student') return preg_match('/^\d{11}$/', $enroll);
-    if ($role === 'faculty') return preg_match('/^\d{6}$/', $enroll);
+    if ($role === 'faculty') return preg_match('/^\d{4}$/', $enroll);
     if ($role === 'hod') return preg_match('/^\d{4}$/', $enroll);
     return false;
 }

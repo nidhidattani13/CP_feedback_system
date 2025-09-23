@@ -65,6 +65,7 @@ if ($event_filter_sem && $event_filter_sem > 0) {
           <th>Date</th>
           <th>Description</th>
           <th>Semester</th>
+          <th>Verified By</th>
         </tr>
       </thead>
       <tbody>
@@ -74,12 +75,32 @@ if ($event_filter_sem && $event_filter_sem > 0) {
           <td><?= htmlspecialchars($e['date']) ?></td>
           <td><?= htmlspecialchars($e['description']) ?></td>
           <td><?= $e['semester_applicability']==0 ? 'All' : htmlspecialchars($e['semester_applicability']) ?></td>
+          <td>
+            <span id="evcount-<?= $e['id'] ?>">Loading...</span> student(s)
+          </td>
         </tr>
         <?php endwhile; else: ?>
-        <tr><td colspan="4" class="text-center text-muted">No events found.</td></tr>
+        <tr><td colspan="5" class="text-center text-muted">No events found.</td></tr>
         <?php endif; ?>
       </tbody>
     </table>
   </div>
 </div>
 <?php include("../includes/footer.php"); ?>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  fetch('<?= APP_BASE ?>/backend/faculty/event_verification_stats.php')
+    .then(response => response.json())
+    .then(data => {
+      for (const [eventId, count] of Object.entries(data)) {
+        const el = document.getElementById('evcount-' + eventId);
+        if (el) el.textContent = count;
+      }
+      // Set 0 for events not in data
+      document.querySelectorAll('[id^="evcount-"]').forEach(function(el) {
+        if (el.textContent === 'Loading...') el.textContent = '0';
+      });
+    });
+});
+</script>
