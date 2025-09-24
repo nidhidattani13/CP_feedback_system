@@ -26,6 +26,11 @@ if ($user['role'] === 'student') {
     $_SESSION['category'] = $user['category'];
 }
 
+if(!$user) {
+  header("Location: " . APP_BASE . "/frontend/auth/login.php?error=invalid");
+  exit;
+}
+
 switch($user['role']) {
     case 'student': header("Location: ".APP_BASE."/frontend/student/dashboard.php"); break;
     case 'faculty': header("Location: ".APP_BASE."/frontend/faculty/dashboard.php"); break;

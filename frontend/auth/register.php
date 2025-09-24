@@ -2,6 +2,13 @@
 session_start();
 include("../includes/header.php");
 ?>
+<?php if(isset($_GET['error']) && $_GET['error'] === 'duplicate'): ?>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  alert('A user with this email or enrollment number already exists.');
+});
+</script>
+<?php endif; ?>
 <div class="row justify-content-center">
   <div class="col-md-6">
     <div class="card card-lean p-4">
@@ -125,10 +132,6 @@ document.querySelector('form').addEventListener('submit', function(e) {
         inp.classList.remove('is-invalid');
       }
     }
-  }
-  if (!valid) e.preventDefault();
-});
-</script>
   }
   if (!valid) e.preventDefault();
 });

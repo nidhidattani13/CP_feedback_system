@@ -25,4 +25,11 @@ $role = $_GET['role'] ?? 'student';
     </div>
   </div>
 </div>
+<?php if(isset($_GET['error']) && $_GET['error'] === 'invalid'): ?>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  alert('Invalid email or password. Please try again.');
+});
+</script>
+<?php endif; ?>
 <?php include("../includes/footer.php"); ?>

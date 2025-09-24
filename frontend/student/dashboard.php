@@ -208,4 +208,3 @@ if (!empty($subject_ids_str)) {
     </div>
   </div>
 </div>
-<?php include("../includes/footer.php"); ?>

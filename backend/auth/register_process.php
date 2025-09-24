@@ -39,6 +39,13 @@ if (!$name || !$email || !$password) {
 
 $hashed = password_hash($password, PASSWORD_DEFAULT);
 
+// After checking for duplicate email or enrollment:
+$check = $conn->query("SELECT id FROM users WHERE email='$email' OR enrollment_no='$enrollment_no'");
+if($check && $check->num_rows > 0) {
+  header("Location: " . APP_BASE . "/frontend/auth/register.php?error=duplicate");
+  exit;
+}
+
 $stmt = $conn->prepare("INSERT INTO users (name,email,password,role,enrollment_no,sgpa1,sgpa2,sgpa3,sgpa4,sgpa5,sgpa6,sgpa7,sgpa8) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)");
 if ($role === 'student') {
     $stmt = $conn->prepare("INSERT INTO users (name,email,password,role,enrollment_no,semester,sgpa1,sgpa2,sgpa3,sgpa4,sgpa5,sgpa6,sgpa7,sgpa8) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
